@@ -5,7 +5,9 @@ import responses
 from unittest import mock
 from urllib3.exceptions import HTTPError
 
-from robobnmp.api import _procura_mandados, _tentativa_api_mandados
+from robobnmp.api import (_procura_mandados,
+                          _tentativa_api_mandados,
+                          mandados_de_prisao)
 from robobnmp.exceptions import ErroApiBNMP
 
 
@@ -67,3 +69,32 @@ def test_tentativas_apos_erro_com_sucesso(_procura_mandados, _sleep):
     ])
 
     assert mandados == {'mandados'}
+
+
+@responses.activate
+def test_paginador():
+    responses.add(
+        responses.POST,
+        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        json={'mandados': [{'mandado-1': 'mandado-1'}]},
+        status=200
+    )
+    responses.add(
+        responses.POST,
+        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        json={'mandados': [{'mandado-2': 'mandado-2'}]},
+        status=200
+    )
+    responses.add(
+        responses.POST,
+        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        json={},
+        status=200
+    )
+
+    mandados = mandados_de_prisao()
+    esperado_1 = {'mandado-1': 'mandado-1'}
+    esperado_2 = {'mandado-2': 'mandado-2'}
+
+    assert next(mandados) == esperado_1
+    assert next(mandados) == esperado_2

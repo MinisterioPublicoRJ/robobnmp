@@ -56,3 +56,13 @@ def _tentativa_api_mandados(pagina):
             continue
     else:
         raise ErroApiBNMP('Máximo de tentativas esgotadas')
+
+
+def mandados_de_prisao():
+    pagina = 1
+    mandados = _procura_mandados(pagina)
+    while mandados:
+        for mandado in mandados:
+                yield mandado
+        pagina += 1
+        mandados = _procura_mandados(pagina)
