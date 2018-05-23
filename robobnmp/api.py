@@ -1,6 +1,9 @@
 import json
 import requests
 
+from time import sleep
+from urllib3.exceptions import HTTPError
+
 from .exceptions import ErroApiBNMP
 
 
@@ -41,3 +44,15 @@ def _procura_mandados(pagina):
         raise ErroApiBNMP('Erro ao chamar api BNMP: %d' % resp.status_code)
 
     return resp.json().get('mandados')
+
+
+def _tentativa_api_mandados(pagina):
+    for tentativa in range(3):
+        try:
+            mandados = _procura_mandados(pagina=1)
+            return mandados
+        except HTTPError:
+            sleep(0.1)
+            continue
+    else:
+        raise ErroApiBNMP('Máximo de tentativas esgotadas')
