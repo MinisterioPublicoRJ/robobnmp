@@ -46,11 +46,11 @@ def _procura_mandados(pagina):
     return resp.json().get('mandados')
 
 
-def _tentativa_api_mandados(pagina):
+def _tentativa_api_mandados(metodo, *args, **kwargs):
     for tentativa in range(3):
         try:
-            mandados = _procura_mandados(pagina=1)
-            return mandados
+            retorno = metodo(*args, **kwargs)
+            return retorno
         except HTTPError:
             sleep(0.1)
             continue
@@ -60,9 +60,9 @@ def _tentativa_api_mandados(pagina):
 
 def mandados_de_prisao():
     pagina = 1
-    mandados = _procura_mandados(pagina)
+    mandados = _tentativa_api_mandados(_procura_mandados, pagina)
     while mandados:
         for mandado in mandados:
                 yield mandado
         pagina += 1
-        mandados = _procura_mandados(pagina)
+        mandados = _tentativa_api_mandados(_procura_mandados, pagina)

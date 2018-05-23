@@ -48,7 +48,7 @@ def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
     _procura_mandados.side_effect = HTTPError()
 
     with pytest.raises(ErroApiBNMP) as erro:
-        _tentativa_api_mandados(pagina=1)
+        _tentativa_api_mandados(_procura_mandados, pagina=1)
 
     assert erro.value.args[0] == 'Máximo de tentativas esgotadas'
 
@@ -62,7 +62,7 @@ def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
 def test_tentativas_apos_erro_com_sucesso(_procura_mandados, _sleep):
     _procura_mandados.side_effect = [HTTPError(), HTTPError(), {'mandados'}]
 
-    mandados = _tentativa_api_mandados(pagina=1)
+    mandados = _tentativa_api_mandados(_procura_mandados, pagina=1)
 
     _procura_mandados.assert_has_calls([
         mock.call(pagina=1), mock.call(pagina=1), mock.call(pagina=1)
