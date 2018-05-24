@@ -4,6 +4,7 @@ import requests
 from time import sleep
 from urllib3.exceptions import HTTPError
 
+from .config import URL_DETALHES, URL_MANDADOS
 from .exceptions import ErroApiBNMP
 
 
@@ -28,6 +29,7 @@ DADOS = {
         'porData': 'false',
     },
 }
+DADOS_DETALHE = {'id': None}
 
 
 def _procura_mandados(pagina, uf):
@@ -35,7 +37,7 @@ def _procura_mandados(pagina, uf):
     DADOS['criterio']['orgaoJulgador']['uf'] = uf
     DADOS['paginador']['paginaAtual'] = pagina
     resp = requests.post(
-        url='http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        url=URL_MANDADOS,
         data=json.dumps(DADOS),
         headers={
             'Content-Type': 'application/json',
@@ -46,6 +48,23 @@ def _procura_mandados(pagina, uf):
         raise ErroApiBNMP('Erro ao chamar api BNMP: %d' % resp.status_code)
 
     return resp.json().get('mandados')
+
+
+def _procura_detalhe(id_mandado):
+    "Procura na API do BNMP os detalhes de um mandado por ID"
+    DADOS_DETALHE['id'] = id_mandado
+    resp = requests.post(
+        url=URL_DETALHES,
+        data=json.dumps(DADOS_DETALHE),
+        headers={
+            'Content-Type': 'application/json',
+            'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+        }
+    )
+    if resp.status_code != 200:
+        raise ErroApiBNMP('Erro ao chamar api BNMP: %d' % resp.status_code)
+
+    return resp.json().get('mandado')
 
 
 def _tentativa_api_mandados(metodo, *args, **kwargs):
