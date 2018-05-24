@@ -9,13 +9,14 @@ from robobnmp.cliente import (_procura_mandados,
                               _tentativa_api_mandados,
                               mandados_de_prisao)
 from robobnmp.exceptions import ErroApiBNMP
+from robobnmp.config import URL_MANDADOS
 
 
 @responses.activate
 def test_post_bnmp(bnmp_resp):
     responses.add(
         responses.POST,
-        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        URL_MANDADOS,
         json=bnmp_resp
     )
 
@@ -31,7 +32,7 @@ def test_post_bnmp(bnmp_resp):
 def test_excecao_cliente_bnmp(bnmp_resp):
     responses.add(
         responses.POST,
-        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        URL_MANDADOS,
         json={},
         status=400
     )
@@ -75,19 +76,19 @@ def test_tentativas_apos_erro_com_sucesso(_procura_mandados, _sleep):
 def test_paginador():
     responses.add(
         responses.POST,
-        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        URL_MANDADOS,
         json={'mandados': [{'mandado-1': 'mandado-1'}]},
         status=200
     )
     responses.add(
         responses.POST,
-        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        URL_MANDADOS,
         json={'mandados': [{'mandado-2': 'mandado-2'}]},
         status=200
     )
     responses.add(
         responses.POST,
-        'http://www.cnj.jus.br/bnmp/rest/pesquisar',
+        URL_MANDADOS,
         json={},
         status=200
     )
