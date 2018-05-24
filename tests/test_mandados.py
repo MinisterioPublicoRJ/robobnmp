@@ -11,6 +11,7 @@ from robobnmp.cliente import (_procura_mandados,
 from robobnmp.exceptions import ErroApiBNMP
 from robobnmp.config import URL_MANDADOS
 
+UF = 'RJ'
 
 @responses.activate
 def test_post_bnmp(bnmp_resp):
@@ -20,11 +21,12 @@ def test_post_bnmp(bnmp_resp):
         json=bnmp_resp
     )
 
-    mandados = _procura_mandados(pagina=1)
+    mandados = _procura_mandados(pagina=1, uf=UF)
     corpo = json.loads(responses.calls[0].request.body)
 
     assert corpo['paginador']['registrosPorPagina'] == 50
     assert corpo['paginador']['paginaAtual'] == 1
+    assert corpo['criterio']['orgaoJulgador']['uf'] == UF
     assert mandados == bnmp_resp['mandados']
 
 
@@ -38,7 +40,7 @@ def test_excecao_cliente_bnmp(bnmp_resp):
     )
 
     with pytest.raises(ErroApiBNMP) as erro:
-        _procura_mandados(pagina=1)
+        _procura_mandados(pagina=1, uf=UF)
 
     assert erro.value.args[0] == 'Erro ao chamar api BNMP: 400'
 
@@ -49,12 +51,12 @@ def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
     _procura_mandados.side_effect = HTTPError()
 
     with pytest.raises(ErroApiBNMP) as erro:
-        _tentativa_api_mandados(_procura_mandados, pagina=1)
+        _tentativa_api_mandados(_procura_mandados, pagina=1, uf=UF)
 
     assert erro.value.args[0] == 'Máximo de tentativas esgotadas'
 
     _procura_mandados.assert_has_calls([
-        mock.call(pagina=1), mock.call(pagina=1), mock.call(pagina=1)
+        mock.call(pagina=1, uf=UF), mock.call(pagina=1, uf=UF), mock.call(pagina=1, uf=UF)
     ])
 
 
@@ -93,7 +95,7 @@ def test_paginador():
         status=200
     )
 
-    mandados = mandados_de_prisao()
+    mandados = mandados_de_prisao(uf=UF)
     esperado_1 = {'mandado-1': 'mandado-1'}
     esperado_2 = {'mandado-2': 'mandado-2'}
 

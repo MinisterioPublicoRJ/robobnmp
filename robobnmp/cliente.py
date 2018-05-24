@@ -11,7 +11,7 @@ REGISTROS = 50
 DADOS = {
     'criterio': {
         'orgaoJulgador': {
-            'uf': 'RJ',
+            'uf': None,
             'municipio': '',
             'descricao': '',
         },
@@ -30,7 +30,9 @@ DADOS = {
 }
 
 
-def _procura_mandados(pagina):
+def _procura_mandados(pagina, uf):
+    "Procura na API do BNMP uma listagem de processos por Unidade Federativa e página"
+    DADOS['criterio']['orgaoJulgador']['uf'] = uf
     DADOS['paginador']['paginaAtual'] = pagina
     resp = requests.post(
         url='http://www.cnj.jus.br/bnmp/rest/pesquisar',
@@ -58,11 +60,11 @@ def _tentativa_api_mandados(metodo, *args, **kwargs):
         raise ErroApiBNMP('Máximo de tentativas esgotadas')
 
 
-def mandados_de_prisao():
+def mandados_de_prisao(uf):
     pagina = 1
-    mandados = _tentativa_api_mandados(_procura_mandados, pagina)
+    mandados = _tentativa_api_mandados(_procura_mandados, pagina, uf)
     while mandados:
         for mandado in mandados:
                 yield mandado
         pagina += 1
-        mandados = _tentativa_api_mandados(_procura_mandados, pagina)
+        mandados = _tentativa_api_mandados(_procura_mandados, pagina, uf)
