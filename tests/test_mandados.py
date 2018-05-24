@@ -101,6 +101,12 @@ def test_paginador():
     mandados = mandados_de_prisao(uf=UF)
     esperado_1 = {'mandado-1': 'mandado-1'}
     esperado_2 = {'mandado-2': 'mandado-2'}
+    mandados_esperados = [esperado_1, esperado_2]
+    assert list(mandados) == mandados_esperados
 
-    assert next(mandados) == esperado_1
-    assert next(mandados) == esperado_2
+    corpos = [
+        json.loads(call.request.body)['paginador']['paginaAtual']
+        for call in list(responses.calls)
+    ]
+
+    assert corpos == [1, 2, 3]
