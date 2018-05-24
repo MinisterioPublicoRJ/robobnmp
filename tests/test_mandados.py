@@ -13,6 +13,7 @@ from robobnmp.config import URL_MANDADOS
 
 UF = 'RJ'
 
+
 @responses.activate
 def test_post_bnmp(bnmp_resp):
     responses.add(
@@ -56,7 +57,9 @@ def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
     assert erro.value.args[0] == 'Máximo de tentativas esgotadas'
 
     _procura_mandados.assert_has_calls([
-        mock.call(pagina=1, uf=UF), mock.call(pagina=1, uf=UF), mock.call(pagina=1, uf=UF)
+        mock.call(pagina=1, uf=UF),
+        mock.call(pagina=1, uf=UF),
+        mock.call(pagina=1, uf=UF)
     ])
 
 

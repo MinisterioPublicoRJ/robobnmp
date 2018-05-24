@@ -33,7 +33,10 @@ DADOS_DETALHE = {'id': None}
 
 
 def _procura_mandados(pagina, uf):
-    "Procura na API do BNMP uma listagem de processos por Unidade Federativa e página"
+    """
+    Procura na API do BNMP uma listagem de processos
+    por Unidade Federativa e página
+    """
     DADOS['criterio']['orgaoJulgador']['uf'] = uf
     DADOS['paginador']['paginaAtual'] = pagina
     resp = requests.post(
