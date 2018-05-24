@@ -5,9 +5,9 @@ import responses
 from unittest import mock
 from urllib3.exceptions import HTTPError
 
-from robobnmp.api import (_procura_mandados,
-                          _tentativa_api_mandados,
-                          mandados_de_prisao)
+from robobnmp.cliente import (_procura_mandados,
+                              _tentativa_api_mandados,
+                              mandados_de_prisao)
 from robobnmp.exceptions import ErroApiBNMP
 
 
@@ -28,7 +28,7 @@ def test_post_bnmp(bnmp_resp):
 
 
 @responses.activate
-def test_excecao_api_bnmp(bnmp_resp):
+def test_excecao_cliente_bnmp(bnmp_resp):
     responses.add(
         responses.POST,
         'http://www.cnj.jus.br/bnmp/rest/pesquisar',
@@ -42,8 +42,8 @@ def test_excecao_api_bnmp(bnmp_resp):
     assert erro.value.args[0] == 'Erro ao chamar api BNMP: 400'
 
 
-@mock.patch('robobnmp.api.sleep')
-@mock.patch('robobnmp.api._procura_mandados')
+@mock.patch('robobnmp.cliente.sleep')
+@mock.patch('robobnmp.cliente._procura_mandados')
 def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
     _procura_mandados.side_effect = HTTPError()
 
@@ -57,8 +57,8 @@ def test_tentativas_apos_erro_sem_sucesso(_procura_mandados, _sleep):
     ])
 
 
-@mock.patch('robobnmp.api.sleep')
-@mock.patch('robobnmp.api._procura_mandados')
+@mock.patch('robobnmp.cliente.sleep')
+@mock.patch('robobnmp.cliente._procura_mandados')
 def test_tentativas_apos_erro_com_sucesso(_procura_mandados, _sleep):
     _procura_mandados.side_effect = [HTTPError(), HTTPError(), {'mandados'}]
 
