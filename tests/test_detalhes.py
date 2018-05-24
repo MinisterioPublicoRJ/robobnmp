@@ -45,14 +45,14 @@ def test_excecao_cliente_bnmp():
 
 @mock.patch('robobnmp.cliente.sleep')
 @mock.patch('robobnmp.cliente._procura_detalhe')
-def detalhes_mandado(_procura_detalhe, _sleep):
+def test_detalhes_mandado(_procura_detalhe, _sleep):
     esperado = {'detalhe-1': 'detalhe-1'}
     _procura_detalhe.side_effect = [HTTPError(), esperado]
 
     detalhe_mandado = detalhes_mandado(id_mandado=NUMERO_MANDADO)
-    _procura_detalhe.assert_has_calls(
-        mock.call(id_mandado=NUMERO_MANDADO),
-        mock.call(id_mandado=NUMERO_MANDADO),
-    )
+    _procura_detalhe.assert_has_calls([
+        mock.call(NUMERO_MANDADO),
+        mock.call(NUMERO_MANDADO),
+    ])
 
     assert esperado == detalhe_mandado
