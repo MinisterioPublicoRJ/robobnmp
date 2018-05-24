@@ -101,7 +101,7 @@ def test_paginador():
     mandados = mandados_de_prisao(uf=UF)
     esperado_1 = {'mandado-1': 'mandado-1'}
     esperado_2 = {'mandado-2': 'mandado-2'}
-    mandados_esperados = [esperado_1, esperado_2]
+    mandados_esperados = [[esperado_1], [esperado_2]]
     assert list(mandados) == mandados_esperados
 
     corpos = [
