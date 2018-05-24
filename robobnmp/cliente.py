@@ -90,3 +90,7 @@ def mandados_de_prisao(uf):
                 yield mandado
         pagina += 1
         mandados = _tentativa_api_mandados(_procura_mandados, pagina, uf)
+
+
+def detalhes_mandado(id_mandado):
+    return _tentativa_api_mandados(_procura_detalhe, id_mandado)
